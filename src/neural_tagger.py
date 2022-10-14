@@ -57,7 +57,7 @@ class POSTagger_Neural (Model):
         self.init = False
 
     
-    def train(self, corpus, max_epoch = 100c) -> None:
+    def train(self, corpus, max_epoch = 100) -> None:
         corpus = clean_corpus(corpus)
         self.tags = sorted(set([ t for sent in corpus for _,t in sent ]))
         n = len(self.tags)
@@ -69,8 +69,8 @@ class POSTagger_Neural (Model):
 
         optim = torch.optim.SGD(
             self.model.parameters(),
-            lr = 1.0,
-            momentum= 0.2
+            lr = 2.0,
+            momentum= 0.4
         )
         loss_fn = nn.CrossEntropyLoss()
 
@@ -89,7 +89,7 @@ class POSTagger_Neural (Model):
         corpus = clean_corpus(corpus)
         true_label = [ t for sent in corpus for _,t in sent ] 
         X = get_nn_input(corpus)
-        Z = self.model(X)
+        Z = self.model(X).detach().numpy()
         pred_label = [ self.tags[x] for x in np.argmax(Z, axis=1) ]
         print(f'Testing accuracy : {accuracy_score(pred_label, true_label)}')
         save_classification_results(true_label, pred_label, self.results_dir, result_id)
@@ -120,5 +120,5 @@ class POSTagger_Neural (Model):
         assert(self.init)
         n = len(self.tags)
         X = get_nn_input_single(sent)
-        Z = self.model(X)
+        Z = self.model(X).detach().numpy()
         return [ self.tags[i] for i in np.argmax(Z, axis=1) ]
