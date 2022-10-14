@@ -57,7 +57,7 @@ class POSTagger_Neural (Model):
         self.init = False
 
     
-    def train(self, corpus, max_epoch = 100c) -> None:
+    def train(self, corpus, max_epoch = 100) -> None:
         corpus = clean_corpus(corpus)
         self.tags = sorted(set([ t for sent in corpus for _,t in sent ]))
         n = len(self.tags)
