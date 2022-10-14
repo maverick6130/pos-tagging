@@ -37,17 +37,6 @@ class POSTagger_HMM (Model):
             self.transition_prob = np.log(self.transition_prob.T/np.sum(self.transition_prob, axis=1)).T
         self.occur_prob = [ { w : np.log(count/total_occur[i]) for w, count in self.occur_prob[i].items() } for i in range(n) ]
         self.init = True
-                
-    
-    def test(self, corpus, result_id) -> None:
-        assert(self.init)
-        corpus = clean_corpus(corpus)
-        true_label = []
-        pred_label = []
-        for sent in tqdm(corpus, desc="Testing HMM Model"):
-            true_label += [ t for _,t in sent ]
-            pred_label += self.predict_tags([w for w,_ in sent])
-        save_classification_results(true_label, pred_label, self.results_dir, result_id)
 
     
     def save(self, model_id) -> None:

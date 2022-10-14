@@ -9,7 +9,6 @@ import json
 import gensim.downloader as api
 import time
 import random
-from sklearn.metrics import accuracy_score
 
 print("Loading Word2Vec model :", end=' ')
 t0 = time.time()
@@ -54,27 +53,6 @@ class POSTagger_HMM_WV(Model):
             random.shuffle(self.w2vmodel_check_words[i])
         self.w2vmodel_check_words = [ check_words[:max_check_words] if len(check_words) > max_check_words else check_words for check_words in self.w2vmodel_check_words ]
         self.init = True
-                
-    
-    def test(self, corpus, result_id) -> None:
-        assert(self.init)
-        corpus = clean_corpus(corpus)
-        true_label = []
-        pred_label = []
-        accuracy = 0
-        total = 0
-        for sent in (pbar := tqdm(corpus, desc="Testing HMM Model")):
-            y_true = [ t for _,t in sent ]
-            y_pred = self.predict_tags([w for w,_ in sent])
-            assert(len(y_true) == len(y_pred))
-            accuracy *= total
-            accuracy += accuracy_score(y_true, y_pred)*len(y_true)
-            total += len(y_true)
-            accuracy /= total
-            true_label += y_true
-            pred_label += y_pred
-            pbar.set_postfix(accuracy = accuracy)
-        save_classification_results(true_label, pred_label, self.results_dir, result_id)
 
     
     def save(self, model_id) -> None:

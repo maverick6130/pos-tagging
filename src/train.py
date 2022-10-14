@@ -1,6 +1,6 @@
 #Setup model selection
 from hmm_tagger import POSTagger_HMM
-from hmm_wv_tagger import POSTagger_HMM_WV
+#from hmm_wv_tagger import POSTagger_HMM_WV
 from neural_tagger import POSTagger_Neural
 import argparse
 parser = argparse.ArgumentParser('Train a POS tagging model with 5-fold validation on the brown corpus. Save a model trained on the complete corpus.')
@@ -8,8 +8,8 @@ parser.add_argument('--model', required=True, type=str, choices={'hmm', 'hmm_w2v
 args = parser.parse_args()
 if args.model == 'hmm':
     get_model = lambda : POSTagger_HMM()
-if args.model == 'hmm_w2v':
-    get_model = lambda : POSTagger_HMM_WV()
+#if args.model == 'hmm_w2v':
+#    get_model = lambda : POSTagger_HMM_WV()
 if args.model == 'neural':
     get_model = lambda : POSTagger_Neural()
     
