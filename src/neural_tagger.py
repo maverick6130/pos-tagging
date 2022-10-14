@@ -5,6 +5,7 @@ import numpy as np
 from tqdm import tqdm
 import os
 import json
+from sklearn.metrics import accuracy_score
 
 import time
 import fasttext.util
@@ -28,7 +29,17 @@ class NeuralNet(nn.Module):
         x = x.tanh()
         x = self.fc2(x)
         return x
+
+def get_nn_input_single(sent):
+    nn_input = []
+    prev = w2vmodel['^']
+    for w,_ in sent:
+        embed = w2vmodel[w]
+        nn_input += [np.hstack((prev, embed))]
+        prev = embed
+    return torch.tensor(np.array(nn_input))
         
+
 def get_nn_input(corpus):
     nn_input = []
     for sent in tqdm(corpus, desc="Building inputs"):
@@ -46,7 +57,7 @@ class POSTagger_Neural (Model):
         self.init = False
 
     
-    def train(self, corpus, max_epoch = 10) -> None:
+    def train(self, corpus, max_epoch = 100c) -> None:
         corpus = clean_corpus(corpus)
         self.tags = sorted(set([ t for sent in corpus for _,t in sent ]))
         n = len(self.tags)
@@ -58,7 +69,8 @@ class POSTagger_Neural (Model):
 
         optim = torch.optim.SGD(
             self.model.parameters(),
-            lr = 0.1
+            lr = 1.0,
+            momentum= 0.2
         )
         loss_fn = nn.CrossEntropyLoss()
 
@@ -72,7 +84,16 @@ class POSTagger_Neural (Model):
 
         self.init = True
 
-    
+    def test(self, corpus, result_id) -> None:
+        assert(self.init)
+        corpus = clean_corpus(corpus)
+        true_label = [ t for sent in corpus for _,t in sent ] 
+        X = get_nn_input(corpus)
+        Z = self.model(X)
+        pred_label = [ self.tags[x] for x in np.argmax(Z, axis=1) ]
+        print(f'Testing accuracy : {accuracy_score(pred_label, true_label)}')
+        save_classification_results(true_label, pred_label, self.results_dir, result_id)
+
     def save(self, model_id) -> None:
         assert(self.init)
         pkl_file = os.path.join(self.model_dir, f'nn_{model_id}.pkl')
@@ -98,6 +119,6 @@ class POSTagger_Neural (Model):
     def predict_tags(self, sent):
         assert(self.init)
         n = len(self.tags)
-        X = get_nn_input([sent])
+        X = get_nn_input_single(sent)
         Z = self.model(X)
         return [ self.tags[i] for i in np.argmax(Z, axis=1) ]
