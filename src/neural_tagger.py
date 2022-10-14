@@ -7,10 +7,11 @@ import os
 import json
 
 import time
-import gensim.downloader as api
+import fasttext.util
 print("Loading Word2Vec model :", end=' ')
 t0 = time.time()
-w2vmodel = api.load('fasttext-wiki-news-subwords-300')
+fasttext.util.download_model('en', if_exists='ignore')  # English
+w2vmodel = fasttext.load_model('cc.en.300.bin')
 t1 = time.time()
 print(f'Done. That took {t1-t0}s')
 
@@ -34,9 +35,9 @@ def get_nn_input(corpus):
         prev = w2vmodel['^']
         for w,_ in sent:
             embed = w2vmodel[w]
-            nn_input += [np.hstack(prev, embed)]
+            nn_input += [np.hstack((prev, embed))]
             prev = embed
-    return torch.tensor(nn_input)
+    return torch.tensor(np.array(nn_input))
 
 class POSTagger_Neural (Model):
     
@@ -52,12 +53,12 @@ class POSTagger_Neural (Model):
         self.tag_idx = { self.tags[i] : i for i in range(n) }
 
         self.model = NeuralNet(600, 200, n)
-        y = torch.tensor([ self.tag_idx(t) for sent in corpus for _,t in sent ])
+        y = torch.tensor([ self.tag_idx[t] for sent in corpus for _,t in sent ])
         X = get_nn_input(corpus)
 
         optim = torch.optim.SGD(
             self.model.parameters(),
-            lr = 1e-2
+            lr = 0.1
         )
         loss_fn = nn.CrossEntropyLoss()
 
