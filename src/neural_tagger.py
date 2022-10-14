@@ -33,7 +33,7 @@ class NeuralNet(nn.Module):
 def get_nn_input_single(sent):
     nn_input = []
     prev = w2vmodel['^']
-    for w,_ in sent:
+    for w in sent:
         embed = w2vmodel[w]
         nn_input += [np.hstack((prev, embed))]
         prev = embed

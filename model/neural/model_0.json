@@ -1,0 +1,31 @@
+{
+  "tags": [
+    ".",
+    "ADJ",
+    "ADP",
+    "ADV",
+    "CONJ",
+    "DET",
+    "NOUN",
+    "NUM",
+    "PRON",
+    "PRT",
+    "VERB",
+    "X"
+  ],
+  "tag_idx": {
+    ".": 0,
+    "ADJ": 1,
+    "ADP": 2,
+    "ADV": 3,
+    "CONJ": 4,
+    "DET": 5,
+    "NOUN": 6,
+    "NUM": 7,
+    "PRON": 8,
+    "PRT": 9,
+    "VERB": 10,
+    "X": 11
+  },
+  "nn_file": "model/neural/nn_0.pkl"
+}
